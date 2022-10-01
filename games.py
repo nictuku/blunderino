@@ -35,6 +35,9 @@ else:
     player_side = "W"
 
 cap = Cp(30)
+inaccuracy = 30
+mistake = 90
+blunder = 200
 
 print("Player side:", player_side)
 print(game.headers["Termination"])
@@ -69,6 +72,10 @@ while not node.is_end():
     suggested = board.san(bestmove)
     cpdelta = cap.score(mate_score=10000)-capprior.score(mate_score=10000)
     print("cpdelta", cpdelta)
+    if cpdelta > blunder and side == player_side:
+        print("Blunderino!")
+        print("move was", move)
+        print("move should have been", bestmove)
 
     board.push(next_node.move)
     node = next_node
