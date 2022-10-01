@@ -4,6 +4,8 @@ from io import StringIO
 import chess.engine
 from chess.engine import Cp
 from chessdotcom import Client
+import chess.svg
+
 import chessdotcom
 Client.request_config["headers"]["User-Agent"] = (
     "Chess Trainer. "
@@ -57,11 +59,10 @@ while not node.is_end():
     # Do an engine evaluation of the position
     # can either set depth or movetime - I am setting movetime for predictable analysis times
     #bestmove, pondermove = engine.go(movetime = time)
-    info = engine.analyse(board, chess.engine.Limit(time=0.1))
+    info = engine.analyse(board, chess.engine.Limit(depth=15))
     bestmove = info["pv"][0]
 
     import pdb
-    #pdb.set_trace()
     if player_side == "B":
         cap=info["score"].black()
     else:
@@ -69,13 +70,17 @@ while not node.is_end():
     pprint.pprint(cap)
     mate = info["score"].is_mate()
     depth=info["depth"]
-    suggested = board.san(bestmove)
     cpdelta = cap.score(mate_score=10000)-capprior.score(mate_score=10000)
-    print("cpdelta", cpdelta)
-    if cpdelta > blunder and side == player_side:
-        print("Blunderino!")
-        print("move was", move)
-        print("move should have been", bestmove)
-
+    print(side, "move", move, info["score"].white())
+    if side == player_side:
+        if cpdelta > blunder:
+            print("Blunderino! cpdelta", cpdelta)
+            print("move was", move)
+            print("move should have been", bestmove)
+            svg = chess.svg.board(board, lastmove=next_node.move)
+            out = open("file.svg", "w")
+            out.write(svg)
+            out.close()
+            pdb.set_trace()
     board.push(next_node.move)
     node = next_node
