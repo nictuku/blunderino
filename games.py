@@ -59,9 +59,7 @@ else:
     player_side = "W"
 
 cap = Cp(30)
-player_cap = cap
-if player_side == "B":
-    player_cap = -cap
+
 inaccuracy = 30
 mistake = 90
 blunder = 200
@@ -89,38 +87,36 @@ while not node.is_end():
 
     import pdb
     cap=info["score"].white()
-    if player_side == "B":
-        player_cap=info["score"].black()
-    else:
-        player_cap=info["score"].white()
     pprint.pprint(cap)
     mate = info["score"].is_mate()
-    depth=info["depth"]
-    cpdelta = cap.score(mate_score=10000)-capprior.score(mate_score=10000)
-    print(side, "move", move, info["score"].white())
+    depth = info["depth"]
+    cpdelta = abs(cap.score(mate_score=10000)-capprior.score(mate_score=10000))
+    ply = board.ply()
+    print(ply, side, "move", move, info["score"].white())
     if side == player_side:
+        print("cpdelta", cpdelta)
         if cpdelta > blunder:
             # TODO: This is detecting positive CP changes as well
-            print("Blunderino! cpdelta", cpdelta)
+            print("Blunderino game {} ply {} ! cpdelta {}".format(i, ply, cpdelta))
             print("move was", move)
             print("move should have been", bestmove)
              # show the board before the blunder
             svg = chess.svg.board(board, flipped=(player_side == "B"))
-            out = open("{}-game-1-front-of-card.svg".format(i), "w")
+            out = open("{:0>5d}-game-{:0>4d}-ply-1-front-of-card.svg".format(i, ply), "w")
             out.write(svg)
             out.close()
             # show the blunder
             svg = chess.svg.board(next_node.board(), lastmove=next_node.move,
                     flipped=(player_side == "B"), colors={'square dark lastmove':'red',
                         'square light lastmove':'red'})
-            out = open("{}-game-2-hint.svg".format(i), "w")
+            out = open("{:0>5d}-game-{:0>4d}-ply-2-hint.svg".format(i, ply), "w")
             out.write(svg)
             out.close()
             # show the blunder and the solution
             svg = chess.svg.board(next_node.board(), lastmove=next_node.move,
                     flipped=(player_side == "B"), colors={'square dark lastmove':'red',
                         'square light lastmove':'red'}, arrows=[[bestmove.from_square, bestmove.to_square]])
-            out = open("{}-game-3-back-of-card.svg".format(i), "w")
+            out = open("{:0>5d}-game-{:0>4d}-ply-3-back-of-card.svg".format(i, ply), "w")
             out.write(svg)
             out.close()
     board.push(next_node.move)
