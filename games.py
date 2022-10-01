@@ -90,7 +90,9 @@ while not node.is_end():
     pprint.pprint(cap)
     mate = info["score"].is_mate()
     depth = info["depth"]
-    cpdelta = abs(cap.score(mate_score=10000)-capprior.score(mate_score=10000))
+    cpdelta = cap.score(mate_score=10000)-capprior.score(mate_score=10000)
+    if player_side == "B":
+        cpdelta = -cpdelta
     ply = board.ply()
     print(ply, side, "move", move, info["score"].white())
     if side == player_side:
