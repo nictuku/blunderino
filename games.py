@@ -8,6 +8,7 @@ from chessdotcom import Client
 import chess.svg
 from datetime import datetime
 import os
+import sys
 
 import chessdotcom
 Client.request_config["headers"]["User-Agent"] = (
@@ -20,8 +21,8 @@ CACHE = "chess-com-{}-{}-{}-state.bin"
 
 engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
 
-def fetch_chess_com_archive_with_cache(username, year, month):
-    cache_path = CACHE.format(username, year, month)
+def fetch_chess_com_archive_with_cache(player_name, year, month):
+    cache_path = CACHE.format(player_name, year, month)
     resp = None
     if os.path.exists(cache_path):
         with open(cache_path, "rb") as f: # "rb" because we want to read in binary mode
@@ -34,14 +35,21 @@ def fetch_chess_com_archive_with_cache(username, year, month):
 
     if resp is None:
         print("fetching from chess.com")
-        resp = chessdotcom.client.get_player_games_by_month_pgn(username, year, month)
+        resp = chessdotcom.client.get_player_games_by_month_pgn(player_name, year, month)
 
         with open(cache_path, "wb") as f:
             resp.SerialDate = datetime.now();
             pickle.dump(resp, f)
     return resp
 
-resp = fetch_chess_com_archive_with_cache("OopsKapootz", "2022", "09")
+
+TARGET_PLAYER = "OopsKapootz"
+TARGET_YEAR = "2022"
+TARGET_MONTH = "10"
+# XXX not yet. 
+TARGET_GAME_OPTIONAL = None
+
+resp = fetch_chess_com_archive_with_cache(TARGET_PLAYER, TARGET_YEAR, TARGET_MONTH)
 # Make it look like a file
 pgnFile = StringIO(resp.json["pgn"]["pgn"])
 i = 0
@@ -56,11 +64,11 @@ while True:
     if i < continueFROM:
         continue    
     print("analyzing game", i)
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
 
     node = game
 
-    target_player = "OopsKapootz"
+    target_player = TARGET_PLAYER
     if game.headers["Black"] == target_player:
         player_side = "B"
     else:
@@ -128,14 +136,14 @@ while True:
                 print("move should have been", bestmove)
                  # show the board before the blunder
                 svg = chess.svg.board(board, flipped=(player_side == "B"))
-                out = open("{}-game-{:0>4d}-ply-1-front-of-card.svg".format(game_id, ply), "w")
+                out = open("{}-ply-{:0>4d}-1-front-of-card.svg".format(game_id, ply), "w")
                 out.write(svg)
                 out.close()
                 # show the blunder
                 svg = chess.svg.board(next_node.board(), lastmove=next_node.move,
                         flipped=(player_side == "B"), colors={'square dark lastmove':'red',
                             'square light lastmove':'red'})
-                out = open("{}-game-{:0>4d}-ply-2-hint.svg".format(game_id, ply), "w")
+                out = open("{}-ply-{:0>4d}-2-hint.svg".format(game_id, ply), "w")
                 out.write(svg)
                 out.close()
                 # show the blunder and the solution
@@ -143,7 +151,7 @@ while True:
                         flipped=(player_side == "B"), colors={'square dark lastmove':'red',
                             'square light lastmove':'red'}, arrows=[[bestmove.from_square, bestmove.to_square],
                                 chess.svg.Arrow(bestreply.from_square, bestreply.to_square, color="red")])
-                out = open("{}-game-{:0>4d}-ply-3-back-of-card.svg".format(game_id, ply), "w")
+                out = open("{}-ply-{:0>4d}-3-back-of-card.svg".format(game_id, ply), "w")
                 out.write(svg)
                 out.close()
         board.push(next_node.move)
@@ -151,4 +159,5 @@ while True:
 
     game = chess.pgn.read_game(pgnFile)
     if game is None:
-        os.exit(1)
+        print("finished")
+        sys.exit(0)
