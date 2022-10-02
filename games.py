@@ -16,28 +16,32 @@ Client.request_config["headers"]["User-Agent"] = (
 )
 
 STOCKFISH_PATH = "/usr/games/stockfish"
-CACHE = "state.bin"
+CACHE = "chess-com-{}-{}-{}-state.bin"
 
 engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
-resp = None
 
-if os.path.exists(CACHE):
-    with open(CACHE, "rb") as f: # "rb" because we want to read in binary mode
-        state = pickle.load(f)
-        if (datetime.now() - state.SerialDate).days > 1:
-            resp = None
-        else:
-            print("using local cache", state.SerialDate)
-            resp = state
+def fetch_chess_com_archive_with_cache(username, year, month):
+    cache_path = CACHE.format(username, year, month)
+    resp = None
+    if os.path.exists(cache_path):
+        with open(cache_path, "rb") as f: # "rb" because we want to read in binary mode
+            state = pickle.load(f)
+            if (datetime.now() - state.SerialDate).days > 1:
+                resp = None
+            else:
+                print("using local cache", state.SerialDate)
+                resp = state
 
-if resp is None:
-    print("fetching from chess.com")
-    resp = chessdotcom.client.get_player_games_by_month_pgn("OopsKapootz", "2022", "09")
+    if resp is None:
+        print("fetching from chess.com")
+        resp = chessdotcom.client.get_player_games_by_month_pgn(username, year, month)
 
-    with open(CACHE, "wb") as f:
-        resp.SerialDate = datetime.now();
-        pickle.dump(resp, f)
+        with open(cache_path, "wb") as f:
+            resp.SerialDate = datetime.now();
+            pickle.dump(resp, f)
+    return resp
 
+resp = fetch_chess_com_archive_with_cache("OopsKapootz", "2022", "09")
 # Make it look like a file
 pgnFile = StringIO(resp.json["pgn"]["pgn"])
 i = 0
