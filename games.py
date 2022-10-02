@@ -43,7 +43,7 @@ pgnFile = StringIO(resp.json["pgn"]["pgn"])
 
 game = chess.pgn.read_game(pgnFile)
 i = 0
-continueFROM = 3
+continueFROM = 4
 while i < continueFROM:
     game = chess.pgn.read_game(pgnFile)
     i = i + 1
@@ -64,6 +64,7 @@ blunder = -200
 
 print("Player side:", player_side)
 print(game.headers["Termination"])
+info = None
 
 while not node.is_end():
     next_node = node.variations[0]
@@ -76,12 +77,11 @@ while not node.is_end():
 
 
     capprior = cap
-
+    infoprior = info
     # Do an engine evaluation of the position
     # can either set depth or movetime - I am setting movetime for predictable analysis times
     #bestmove, pondermove = engine.go(movetime = time)
     info = engine.analyse(next_node.board(), chess.engine.Limit(depth=15))
-    bestmove = info["pv"][0]
 
     import pdb
     cap=info["score"].white()
@@ -90,20 +90,24 @@ while not node.is_end():
     depth = info["depth"]
     # by convention in this code, cpdelta of less than -200 bad, no matter what color
     cpdelta = cap.score(mate_score=10000)-capprior.score(mate_score=10000)
-    #if side == "B":
-    #    cpdelta = -cpdelta
+    # We want this to show as a negative cpdelta for black (meaning a blunder)
+    #20 W move O-O cap +218 delta -191
+    #21 B move Qe7 cap +420 delta 202
+    if side == "B":
+        cpdelta = -cpdelta
     ply = board.ply()
     print(ply, side, "move", move, "cap", cap, "delta", cpdelta)
     print("prev cap", capprior.score(mate_score=10000), "curr cap", cap.score(mate_score=10000))
-    if ply == 26:
+    if ply == 39:
         pdb.set_trace()
-    if side == player_side:
+    # pv is not in info when a mate was played, for example.
+    if side == player_side and "pv" in info:
         print("cpdelta", cpdelta)
         #if cpdelta < blunder:
         if cpdelta < blunder:
             #blunderinfo = engine.analyse(next_node.board(), chess.engine.Limit(depth=15))
-            #bestreply = blunderinfo["pv"][0]
-            bestreply = bestmove # blunderinfo["pv"][0]
+            bestreply = info["pv"][0]
+            bestmove = infoprior["pv"][0]
             # TODO: This is detecting positive CP changes as well
             print("Blunderino game {} ply {} ! cpdelta {}".format(i, ply, cpdelta))
             print("move was", move)
