@@ -43,12 +43,16 @@ pgnFile = StringIO(resp.json["pgn"]["pgn"])
 i = 0
 continueFROM = 0
 
+def chess_com_game_id(gameLink, game_date):
+    return "chess-com-live-{}-{}".format(game_date, gameLink.replace("https://www.chess.com/game/live/",""))
+
 while True:
+    game = chess.pgn.read_game(pgnFile)
     i = i + 1
     if i < continueFROM:
-        continue
+        continue    
     print("analyzing game", i)
-    game = chess.pgn.read_game(pgnFile)
+    import pdb; pdb.set_trace()
 
     node = game
 
@@ -63,8 +67,12 @@ while True:
     mistake = -90
     blunder = -200
 
+    game_date = game.headers["UTCDate"]
+    game_id = chess_com_game_id(game.headers["Link"], game_date)
+
     print("\n\n===========================================")
     pprint.pprint(game.headers)
+    print("Game:", game_id)
     print("Player side:", player_side)
     print(game.headers["Termination"])
     info = None
@@ -86,7 +94,6 @@ while True:
         #bestmove, pondermove = engine.go(movetime = time)
         info = engine.analyse(next_node.board(), chess.engine.Limit(depth=15))
 
-        import pdb
         cap=info["score"].white()
         pprint.pprint("white score {}".format(cap))
         mate = info["score"].is_mate()
@@ -117,14 +124,14 @@ while True:
                 print("move should have been", bestmove)
                  # show the board before the blunder
                 svg = chess.svg.board(board, flipped=(player_side == "B"))
-                out = open("{:0>5d}-game-{:0>4d}-ply-1-front-of-card.svg".format(i, ply), "w")
+                out = open("{}-game-{:0>4d}-ply-1-front-of-card.svg".format(game_id, ply), "w")
                 out.write(svg)
                 out.close()
                 # show the blunder
                 svg = chess.svg.board(next_node.board(), lastmove=next_node.move,
                         flipped=(player_side == "B"), colors={'square dark lastmove':'red',
                             'square light lastmove':'red'})
-                out = open("{:0>5d}-game-{:0>4d}-ply-2-hint.svg".format(i, ply), "w")
+                out = open("{}-game-{:0>4d}-ply-2-hint.svg".format(game_id, ply), "w")
                 out.write(svg)
                 out.close()
                 # show the blunder and the solution
@@ -132,7 +139,7 @@ while True:
                         flipped=(player_side == "B"), colors={'square dark lastmove':'red',
                             'square light lastmove':'red'}, arrows=[[bestmove.from_square, bestmove.to_square],
                                 chess.svg.Arrow(bestreply.from_square, bestreply.to_square, color="red")])
-                out = open("{:0>5d}-game-{:0>4d}-ply-3-back-of-card.svg".format(i, ply), "w")
+                out = open("{}-game-{:0>4d}-ply-3-back-of-card.svg".format(game_id, ply), "w")
                 out.write(svg)
                 out.close()
         board.push(next_node.move)
