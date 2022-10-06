@@ -64,7 +64,6 @@ while True:
     if i < continueFROM:
         continue    
     print("analyzing game", i)
-    #import pdb; pdb.set_trace()
 
     node = game
 
@@ -88,6 +87,9 @@ while True:
     print("Player side:", player_side)
     print(game.headers["Termination"])
     info = None
+    
+
+    report_position = []  # list of dictionaries 
 
     while not node.is_end():
         next_node = node.variations[0]
@@ -154,6 +156,29 @@ while True:
                 out = open("{}-ply-{:0>4d}-3-back-of-card.svg".format(game_id, ply), "w")
                 out.write(svg)
                 out.close()
+                rep = {
+                        "game_id": game_id,
+                        "game_date": game_date,
+                        "termination": game.headers["Termination"],
+                        "white": game.headers["White"],
+                        "black": game.headers["Black"],
+
+                        "depth": depth,
+                        "score": cap.score(mate_score=10000),
+                        "cpdelta": cpdelta,
+                        "mate": mate,
+                        "ply": ply,
+                        "move": move,
+                        "best_move": bestmove.uci(),
+                        "player_side": player_side,
+                        "position": board.fen(),
+                        "next_position": next_node.board().fen(),
+                        "next_move": next_node.move.uci(),
+                        "best_reply": bestreply.uci(),
+                    }
+                print(rep)
+                import pdb; pdb.set_trace()
+
         board.push(next_node.move)
         node = next_node
 
