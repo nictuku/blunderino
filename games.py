@@ -16,6 +16,11 @@ Client.request_config["headers"]["User-Agent"] = (
     "Contact me at yves.junqueira@gmail.com"
 )
 
+
+from pymongo_get_database import get_database
+db = get_database()
+col = db["positions"]
+
 STOCKFISH_PATH = "/usr/games/stockfish"
 CACHE = "chess-com-{}-{}-{}-state.bin"
 
@@ -62,8 +67,13 @@ while True:
     game = chess.pgn.read_game(pgnFile)
     i = i + 1
     if i < continueFROM:
-        continue    
+        continue
     print("analyzing game", i)
+    if game is None:
+        print("finished")
+        sys.exit(0)
+    exporter = chess.pgn.StringExporter(headers=True, variations=True, comments=True)
+    pgn = game.accept(exporter)
 
     node = game
 
@@ -175,14 +185,11 @@ while True:
                         "next_position": next_node.board().fen(),
                         "next_move": next_node.move.uci(),
                         "best_reply": bestreply.uci(),
+                        "pgn": pgn,
                     }
                 print(rep)
-                import pdb; pdb.set_trace()
+                col.insert_one(rep)
 
         board.push(next_node.move)
         node = next_node
 
-    game = chess.pgn.read_game(pgnFile)
-    if game is None:
-        print("finished")
-        sys.exit(0)

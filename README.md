@@ -13,6 +13,10 @@ New Plan:
 - schedule based on SRS
 - UI to batch import games. Parameters: username, month, blunder/mistakes/etc.
 
+UI mockups:
+- Logs in, sees number of cards to study and average time it would take to review them and expected rating improve from doing it
+
+
 
 
 Old plan:
