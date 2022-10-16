@@ -12,6 +12,7 @@ New Plan:
 - create study cards for them
 - schedule based on SRS
 - UI to batch import games. Parameters: username, month, blunder/mistakes/etc.
+  ~ first let's make the history load go faster and not have duplicates
 
 UI mockups:
 - Logs in, sees number of cards to study and average time it would take to review them and expected rating improve from doing it
