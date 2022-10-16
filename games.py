@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import pickle
 import pprint
 import chess.pgn
@@ -17,7 +18,7 @@ Client.request_config["headers"]["User-Agent"] = (
 )
 
 
-from pymongo_get_database import get_database, last_game_inserted
+from pymongo_get_database import get_database, last_game_inserted, close_database
 db = get_database()
 col = db["positions"]
 
@@ -57,7 +58,7 @@ TARGET_GAME_OPTIONAL = None
 def chess_com_game_id(gameLink, game_date):
     return "chess-com-live-{}-{}".format(game_date, gameLink.replace("https://www.chess.com/game/live/",""))
 
-if __name__ == '__main__':
+def main():
     resp = fetch_chess_com_archive_with_cache(TARGET_PLAYER, TARGET_YEAR, TARGET_MONTH)
     # Make it look like a file
     pgnFile = StringIO(resp.json["pgn"]["pgn"])
@@ -76,7 +77,8 @@ if __name__ == '__main__':
         print("analyzing game", i)
         if game is None:
             print("finished")
-            sys.exit(0)
+            break
+
         exporter = chess.pgn.StringExporter(headers=True, variations=True, comments=True)
         pgn = game.accept(exporter)
 
@@ -205,3 +207,7 @@ if __name__ == '__main__':
             board.push(next_node.move)
             node = next_node
 
+    close_database()
+
+if __name__ == "__main__":
+    main()

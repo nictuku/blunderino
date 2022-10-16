@@ -1,16 +1,23 @@
 from pymongo import MongoClient
 import pymongo
 
+__client__ = None
+
+def close_database():
+    # I don't think this is currently working..
+    if __client__:
+        __client__.close()
+
 def get_database():
  
    # Provide the mongodb atlas url to connect python to mongodb using pymongo
    CONNECTION_STRING = "mongodb+srv://blunderino-python:CmlC9mEJzH1Gjrh0@cluster0.x2a6d.mongodb.net/?retryWrites=true&w=majority"
  
    # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
-   client = MongoClient(CONNECTION_STRING)
+   __client__ = MongoClient(CONNECTION_STRING)
  
    # Create the database for our example (we will use the same database throughout the tutorial
-   return client['blunderino']
+   return __client__['blunderino']
 
 
 def last_game_inserted(collection):
