@@ -4,6 +4,7 @@ import pymongo
 __client__ = None
 
 def close_database():
+    print("Closing the database for client", __client__)
     # I don't think this is currently working..
     if __client__:
         __client__.close()

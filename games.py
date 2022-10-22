@@ -10,13 +10,12 @@ import chess.svg
 from datetime import datetime
 import os
 import sys
-
+import faulthandler
 import chessdotcom
 Client.request_config["headers"]["User-Agent"] = (
     "Chess Trainer. "
     "Contact me at yves.junqueira@gmail.com"
 )
-
 
 from pymongo_get_database import get_database, last_game_inserted, close_database
 db = get_database()
@@ -208,6 +207,8 @@ def main():
             node = next_node
 
     close_database()
+    engine.quit()
 
 if __name__ == "__main__":
+    faulthandler.enable()
     main()
