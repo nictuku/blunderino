@@ -483,8 +483,9 @@
         } else {
             //    window.Retool.modelUpdate({ hasPreviousMove: false, action: "", history: window.historyDetails, selectedMove: 0});
         }
-        stockfish.postMessage('stop')
-        stockfish.postMessage('ucinewgame')
+	// These affect the drag and drop on mobile.
+        //stockfish.postMessage('stop')
+        //stockfish.postMessage('ucinewgame')
 
         stockfish.postMessage('setoption name UCI_AnalyseMode value true')
         stockfish.postMessage('setoption name hash value 64')
