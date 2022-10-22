@@ -260,7 +260,7 @@
                 }
 
             } else {
-                status = "NOT BEST MOVE " + status
+                status = "This is not the best move." // + status
                 window.Retool.modelUpdate({
                     recallSucceeded: false
                 });
