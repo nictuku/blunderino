@@ -32,7 +32,7 @@ def fetch_chess_com_archive_with_cache(player_name, year, month):
     if os.path.exists(cache_path):
         with open(cache_path, "rb") as f: # "rb" because we want to read in binary mode
             state = pickle.load(f)
-            if (datetime.now() - state.SerialDate).days > 1:
+            if (datetime.now() - state.SerialDate).seconds > 60:
                 resp = None
             else:
                 print("using local cache", state.SerialDate)
@@ -58,6 +58,8 @@ def chess_com_game_id(gameLink, game_date):
     return "chess-com-live-{}-{}".format(game_date, gameLink.replace("https://www.chess.com/game/live/",""))
 
 def main():
+    os.chdir("/home/yves/src/github.com/nictuku/chesstrainer")
+
     resp = fetch_chess_com_archive_with_cache(TARGET_PLAYER, TARGET_YEAR, TARGET_MONTH)
     # Make it look like a file
     pgnFile = StringIO(resp.json["pgn"]["pgn"])
