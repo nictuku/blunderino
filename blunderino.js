@@ -245,7 +245,9 @@
                     recallSucceeded: false
                 });
                 window.Retool.modelUpdate({
-                    tryAgainButtonActive: true
+                    //tryAgainButtonActive: true
+                    tryAgainButtonActive: false,
+                    nextButtonActive: true,
                 });
                 if (recallSucceeded === null) {
                     window.Retool.triggerQuery('insertRecall')
@@ -260,12 +262,15 @@
                 }
 
             } else {
-                status = "This is not the best move." // + status
+                status = "This is not the best move. Best would be " + bestMove.from + bestMove.to + "." // + status
+		status += " In the game you played " + playerMove.from + playerMove.to + ", which is countered by " + bestReply.from + bestReply.to
                 window.Retool.modelUpdate({
                     recallSucceeded: false
                 });
                 window.Retool.modelUpdate({
-                    tryAgainButtonActive: true
+                    //tryAgainButtonActive: true
+                    tryAgainButtonActive: false,
+                    nextButtonActive: true,
                 });
                 if (recallSucceeded === null) {
                     window.Retool.triggerQuery('insertRecall')
