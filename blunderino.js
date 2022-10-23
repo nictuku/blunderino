@@ -225,7 +225,7 @@
             if ((prevMove.from === bestMove.from) && (prevMove.to === bestMove.to)) {
                 status = "<p style='color:green; font-weight: bold;'>You Found the Best Move!</p>"
                 let srs = new SpacedRepetition(dayjs());
-                status += ". You did " + playerMove.from + playerMove.to + " during the game"
+                status += "You did " + playerMove.from + playerMove.to + " during the game"
                 if (bestReply) {
                     status += ", which is countered by " + bestReply.from + bestReply.to
                 }
@@ -253,7 +253,11 @@
                     window.Retool.triggerQuery('insertRecall')
                 }
                 recallSucceeded = false
-                status = "BAD MOVE, SAME AS IN GAME " + status
+                status = "This is not the best move. Best would be " + bestMove.from + bestMove.to + "." // + status
+		status += " In the game you played the same move, " + playerMove.from + playerMove.to + ", which is countered by " + bestReply.from + bestReply.to
+                window.Retool.modelUpdate({
+                    recallSucceeded: false
+                });
                 // We already have the server-side analysis.
                 // This is displaying what happened in the real game.
                 if (bestReply) {
