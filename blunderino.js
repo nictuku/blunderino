@@ -38,6 +38,7 @@
 
     // WASM version won't load probably because of script origin rules
     var stockfish = createWorker('https://cdn.statically.io/gh/nictuku/fish/ea63076df2c12b8a2f0c1bca040d7ccf7bad287f/stockfish.js');
+    var successAudio = new Audio('https://vimvm.com/success_by_Pixabay.mp3')
 
     const defaultConfig = {
         'new': {
@@ -224,6 +225,7 @@
 
             if ((prevMove.from === bestMove.from) && (prevMove.to === bestMove.to)) {
                 status = "<p style='color:green; font-weight: bold;'>You Found the Best Move!</p>"
+		successAudio.play();
                 let srs = new SpacedRepetition(dayjs());
                 status += "You did " + playerMove.from + playerMove.to + " during the game"
                 if (bestReply) {
