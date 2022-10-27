@@ -258,21 +258,27 @@
                 recallSucceeded = false
                 status = "This is not the best move. Best would be " + bestMove.from + bestMove.to + "." // + status
 		status += " In the game you played the same move, " + playerMove.from + playerMove.to + ", which is countered by " + bestReply.from + bestReply.to
+		greySquare(playerMove.from)
+		greySquare(playerMove.to)
+		arrow(bestMove.from, bestMove.to)
                 window.Retool.modelUpdate({
                     recallSucceeded: false
                 });
                 // We already have the server-side analysis.
                 // This is displaying what happened in the real game.
                 if (bestReply) {
-                    arrow(bestReply.from, bestReply.to)
-		    greySquare(bestReply.from)
-                    greySquare(bestReply.to)
+                    arrow(bestReply.from, bestReply.to, 'rgb(255, 0, 0)')
+		    //greySquare(bestReply.from)
+                    //greySquare(bestReply.to)
                 }
 
             } else {
                 status = "This is not the best move. Best would be " + bestMove.from + bestMove.to + "." // + status
 		status += " In the game you played " + playerMove.from + playerMove.to + ", which is countered by " + bestReply.from + bestReply.to
-                window.Retool.modelUpdate({
+		arrow(bestMove.from, bestMove.to)
+       		//greySquare(playerMove.from)
+		//greySquare(playerMove.to)
+       		window.Retool.modelUpdate({
                     recallSucceeded: false
                 });
                 window.Retool.modelUpdate({
@@ -444,8 +450,9 @@
 	return [ centerX+correction, centerY+correction ];
     }
 
-    function arrow(square1, square2) {
-	console.log("adding arrow", square1, square2)
+    function arrow(square1, square2, COLOUR = 'rgb(50, 104, 168)') {
+	overlay.setColour(COLOUR)
+	console.log("adding arrow", square1, square2, COLOUR)
 	let [ x, y  ] = squareCoordinates(square1)
 	overlay.initialPoint.x = x
 	overlay.initialPoint.y = y
@@ -473,6 +480,7 @@
     function setupBoard() {
         removeGreySquares()
 	overlay.clear()
+        showNextEngineBestMove = false
 
         if (model.board) {
             board.position(model.board.position, false);
@@ -556,9 +564,9 @@
             //game.move({from: match[1], to: match[2], promotion: match[3]});
             console.log("best move", match)
             // At the moment we receive these bestmove messages after the player make a move, so let's just show the computer reply as gray stuff.
-	    arrow(match[1], match[2])
-            greySquare(match[1])
-            greySquare(match[2])
+	    arrow(match[1], match[2], 'rgb(255, 0, 0)')
+            //greySquare(match[1])
+            //greySquare(match[2])
             showNextEngineBestMove = false
         }
     }

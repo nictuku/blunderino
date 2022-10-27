@@ -45,6 +45,11 @@ class ChessboardArrows {
 	this.mouseDown = false;
 
 	}
+	setColour(COLOUR = 'rgb(50, 104, 168)') {
+		this.colour = COLOUR
+		this.setContextStyle(this.primaryContext)
+		this.setContextStyle(this.drawContext)
+	}
 	// source: https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
 	drawArrow(context, fromx, fromy, tox, toy, r) {
 		var x_center = tox;
