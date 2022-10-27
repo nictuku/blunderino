@@ -131,6 +131,7 @@
     var blackSquareGrey = '#696969'
     var showNextEngineBestMove = false
     var recallSucceeded = null
+    var overlay = null
 
     function removeGreySquares() {
         console.log("removing greys")
@@ -263,7 +264,8 @@
                 // We already have the server-side analysis.
                 // This is displaying what happened in the real game.
                 if (bestReply) {
-                    greySquare(bestReply.from)
+                    arrow(bestReply.from, bestReply.to)
+		    greySquare(bestReply.from)
                     greySquare(bestReply.to)
                 }
 
@@ -429,21 +431,48 @@
         updateGame(game.pgn())
     }
 
+    function squareCoordinates(square) {
+            var $sq = $('#board1 .square-' + square)
+	    var offset = $sq.offset();
+	    var width = $sq.outerWidth();
+	    var height = $sq.outerHeight();
+
+	    var centerX = offset.left + width / 2;
+	    var centerY = offset.top + height / 2;
+
+	    var correction = -8;
+	return [ centerX+correction, centerY+correction ];
+    }
+
+    function arrow(square1, square2) {
+	console.log("adding arrow", square1, square2)
+	let [ x, y  ] = squareCoordinates(square1)
+	overlay.initialPoint.x = x
+	overlay.initialPoint.y = y
+	console.log("yay", x,  y)
+	let [ x2, y2  ] = squareCoordinates(square2)
+	overlay.finalPoint.x = x2
+	overlay.finalPoint.y = y2
+	console.log("yay2", x2,  y2)
+	overlay.drawArrowToCanvas(overlay.drawContext)
+    }
+
+
     var config = {
         pieceTheme: 'https://chessboardjs.com/img/chesspieces/alpha/{piece}.png',
         position: '{model.board.position}',
-        draggable: false,
-        //onDragStart: onDragStart,
-        //onDrop: onDrop,
-        //onSnapEnd: onSnapEnd
+        draggable: true,
+        onDragStart: onDragStart,
+        onDrop: onDrop,
+        onSnapEnd: onSnapEnd
     }
     board = Chessboard('board1', config)
-    var overlay = new ChessboardArrows('board_wrapper');
-
+    var overlay = new ChessboardArrows('board_wrapper', 1);
     updateStatus()
 
     function setupBoard() {
         removeGreySquares()
+	overlay.clear()
 
         if (model.board) {
             board.position(model.board.position, false);
@@ -527,6 +556,7 @@
             //game.move({from: match[1], to: match[2], promotion: match[3]});
             console.log("best move", match)
             // At the moment we receive these bestmove messages after the player make a move, so let's just show the computer reply as gray stuff.
+	    arrow(match[1], match[2])
             greySquare(match[1])
             greySquare(match[2])
             showNextEngineBestMove = false

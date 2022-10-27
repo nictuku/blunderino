@@ -20,6 +20,8 @@ class ChessboardArrows {
 
 	// drawing canvas
 	this.drawCanvas = document.getElementById('drawing_canvas');
+        console.log("drawCanvas", this.drawCanvas.style.width, this.drawCanvas.style.height);
+        console.log("drawCanvas2", this.drawCanvas.width, this.drawCanvas.height);
 	this.drawContext = this.changeResolution(this.drawCanvas, this.resFactor);
 	this.setContextStyle(this.drawContext);
 
@@ -31,11 +33,11 @@ class ChessboardArrows {
 	// setup mouse event callbacks
 	var board = document.getElementById(id);
 	var boardArrows = this;
-	board.addEventListener("mousedown", function(event) { boardArrows.onMouseDown(event); });
+/*	board.addEventListener("mousedown", function(event) { boardArrows.onMouseDown(event); });
 	board.addEventListener("mouseup", function(event) { boardArrows.onMouseUp(event); });
 	board.addEventListener("mousemove", function(event) { boardArrows.onMouseMove(event); });
 	board.addEventListener('contextmenu', function (e) { e.preventDefault(); }, false);
-
+*/
 	// initialise vars
 	this.initialPoint = { x: null, y: null };
 	this.finalPoint = { x: null, y: null };
@@ -108,9 +110,14 @@ class ChessboardArrows {
 	    }
 	    else if (event.which == 1) { // left click
 		// clear canvases
+		this.clear()
+	    }
+	}
+
+	clear() {
 		this.drawContext.clearRect(0, 0, this.drawCanvas.width, this.drawCanvas.height);
 		this.primaryContext.clearRect(0, 0, this.primaryCanvas.width, this.primaryCanvas.height);
-	    }
+
 	}
 
 	onMouseMove(event) {
@@ -170,10 +177,12 @@ class ChessboardArrows {
 	    // Set up CSS size.
 	    canvas.style.width = canvas.style.width || canvas.width + 'px';
 	    canvas.style.height = canvas.style.height || canvas.height + 'px';
+   	    console.log("canvas w h", canvas.style.width, canvas.style.height)
 
 	    // Resize canvas and scale future draws.
 	    canvas.width = Math.ceil(canvas.width * scaleFactor);
 	    canvas.height = Math.ceil(canvas.height * scaleFactor);
+   	    console.log("canvas2 w h", canvas.width, canvas.height)
 	    var ctx = canvas.getContext('2d');
 	    ctx.scale(scaleFactor, scaleFactor);
 	    return ctx;
