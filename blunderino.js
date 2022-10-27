@@ -432,12 +432,14 @@
     var config = {
         pieceTheme: 'https://chessboardjs.com/img/chesspieces/alpha/{piece}.png',
         position: '{model.board.position}',
-        draggable: true,
-        onDragStart: onDragStart,
-        onDrop: onDrop,
-        onSnapEnd: onSnapEnd
+        draggable: false,
+        //onDragStart: onDragStart,
+        //onDrop: onDrop,
+        //onSnapEnd: onSnapEnd
     }
     board = Chessboard('board1', config)
+    var overlay = new ChessboardArrows('board_wrapper');
+
     updateStatus()
 
     function setupBoard() {
