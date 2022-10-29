@@ -195,7 +195,7 @@
 		// This is used by the API-driven analysis.
 		displayedPosition: game.fen()
 	});
-
+        window.Retool.triggerQuery('moveAnalysisQuery')
     }
 
     function updateStatus(prevMove) {
@@ -237,6 +237,8 @@
                 if (bestReply) {
                     status += ", which is countered by " + bestReply.from + bestReply.to
                 }
+		greySquare(prevMove.from)
+		greySquare(prevMove.to)
 
                 if (recallSucceeded === null) {
                     window.Retool.triggerQuery('insertRecall')
@@ -263,8 +265,8 @@
                 recallSucceeded = false
                 status = "This is not the best move. Best would be " + bestMove.from + bestMove.to + "." // + status
 		status += " In the game you played the same move, " + playerMove.from + playerMove.to + ", which is countered by " + bestReply.from + bestReply.to
-		greySquare(playerMove.from)
-		greySquare(playerMove.to)
+		greySquare(prevMove.from)
+		greySquare(prevMove.to)
 		arrow(bestMove.from, bestMove.to)
                 window.Retool.modelUpdate({
                     recallSucceeded: false
@@ -281,8 +283,8 @@
                 status = "This is not the best move. Best would be " + bestMove.from + bestMove.to + "." // + status
 		status += " In the game you played " + playerMove.from + playerMove.to + ", which is countered by " + bestReply.from + bestReply.to
 		arrow(bestMove.from, bestMove.to)
-       		//greySquare(playerMove.from)
-		//greySquare(playerMove.to)
+       		greySquare(prevMove.from)
+		greySquare(prevMove.to)
        		window.Retool.modelUpdate({
                     recallSucceeded: false
                 });
