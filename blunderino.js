@@ -191,6 +191,11 @@
     // for castling, en passant, pawn promotion
     function onSnapEnd() {
         board.position(game.fen())
+	window.Retool.modelUpdate({
+		// This is used by the API-driven analysis.
+		displayedPosition: game.fen()
+	});
+
     }
 
     function updateStatus(prevMove) {
@@ -632,7 +637,8 @@
             window.Retool.modelUpdate({
                 tryAgainPressed: false,
                 tryAgainButtonActive: false,
-                recallSucceeded: null
+                recallSucceeded: null,
+		displayedPosition: null
             });
 
         } else if (model.recallSucceeded === null) {
